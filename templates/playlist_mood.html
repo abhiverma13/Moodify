@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Mood</title>
+
+    <style>
+      ul {
+        column-count: 1; /* Set the initial column count to 1 */
+      }
+
+    @media screen and (min-width: 600px) {
+      /* Adjust the column count for larger screens */
+      ul {
+        column-count: 3;
+      }
+    }
+      
+    </style>
+</head>
+<body>
+    <h1>{{ playlist_name }}</h1>
+
+    {% if tracks %}
+        <h2>Sad Tracks:</h2>
+        <ul>
+            {% for track in tracks %}
+                <li>{{ track['name'] }} - {{ track['artists'][0]['name'] }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No sad tracks found in the playlist.</p>
+    {% endif %}
+
+    <a href="{{ url_for('playlists') }}"><button>Back to Playlists</button></a>
+    <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+    <a href="{{ url_for('playlist_info', playlist_id=playlist_id) }}"><button>Back to Playlist Info</button></a>
+</body>
+</html>
