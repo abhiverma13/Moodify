@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Playlists</title>
+</head>
+<body>
+  <h1>Your Playlists, {{ display_name }}:</h1>
+
+  {% if no_playlist_found %}
+    <p>Playlist ID Not Found.</p>
+    <a href="{{ url_for('playlists') }}"><button>Back to Playlists</button></a>
+  {% elif playlists %}
+    <ul>
+      {% for playlist in playlists %}
+        <li>{{ playlist['name'] }} - ID: {{ playlist['id'] }}</li>
+      {% endfor %}
+    </ul>
+
+    <form method="post" action="{{ url_for('playlists') }}">
+      <label for="playlist_id">Enter Playlist ID:</label>
+      <input type="text" name="playlist_id" id="playlist_id" required>
+      <button type="submit">Get Playlist Info</button>
+    </form>
+  {% else %}
+    <p>No Playlists Found.</p>
+  {% endif %}
+
+  <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+</body>
+</html>
