@@ -9,13 +9,13 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 
+spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+
 app = Flask(__name__)
 
 #HOME PAGE
 @app.route("/")
 def index():
-    spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
-
     user_profile = spotify_client.get_user_profile()
     display_name = user_profile.get("display_name", "N/A")
 
@@ -25,8 +25,6 @@ def index():
 #EXISTING PLAYLIST
 @app.route("/playlists", methods=['GET', 'POST'])
 def playlists():
-    spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
-
     user_profile = spotify_client.get_user_profile()
     display_name = user_profile.get("display_name", "N/A")
 
@@ -42,8 +40,6 @@ def playlists():
 
 @app.route("/playlist_info/<playlist_id>")
 def playlist_info(playlist_id):
-    spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
-
     try:
         playlist = spotify_client.get_playlist_info(playlist_id)
         return render_template('playlist_info.html', playlist=playlist)
@@ -52,17 +48,14 @@ def playlist_info(playlist_id):
         display_name = user_profile.get("display_name", "N/A")
         return render_template('playlists.html', no_playlist_found=True, display_name=display_name)
 
-# Updated route for handling "Sad" mood
-@app.route("/playlist_info/<playlist_id>/sad")
-def playlist_sad(playlist_id):
-    spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
-
+@app.route("/playlist_info/<playlist_id>/<mood>")
+def playlist_mood(playlist_id, mood):
     # Get the total number of tracks in the playlist
     playlist_info = spotify_client.get_playlist_info(playlist_id)
     total_tracks = playlist_info['tracks']['total']
 
-    # Initialize a list to store sad tracks
-    sad_tracks = []
+    # Initialize a list to store tracks based on the specified mood
+    mood_tracks = []
 
     # Set the maximum number of tracks to retrieve per request
     limit = 50  # You can adjust this value based on your needs
@@ -87,13 +80,19 @@ def playlist_sad(playlist_id):
             # Get audio features for the track
             audio_features = spotify_client.get_track_audio_features(track_id)
 
-            # Check conditions for a "sad" track
-            if audio_features and all(
+            # Check conditions for the specified mood
+            if mood == 'Sad' and audio_features and all(
                 feature['valence'] < 0.3 and feature['energy'] < 0.6 and feature['danceability'] < 0.8
                 for feature in audio_features
             ):
                 print("True")
-                sad_tracks.append(track["track"])
+                mood_tracks.append(track["track"])
+            elif mood == 'Party' and audio_features and all(
+                (feature['energy'] + feature['danceability'])/2 > 0.65 and (feature['danceability'] > 0.7 or feature['energy'] > 0.7) and feature['tempo'] > 120
+                for feature in audio_features
+            ):
+                print("True")
+                mood_tracks.append(track["track"])
             else:
                 print("False")
             j += 1
@@ -101,7 +100,60 @@ def playlist_sad(playlist_id):
     playlist_name = playlist_info['name']
     playlist_id = playlist_info['id']
 
-    return render_template("playlist_mood.html", playlist_name=playlist_name, playlist_id=playlist_id, mood="Sad", tracks=sad_tracks)
+    return render_template("playlist_mood.html", playlist_name=playlist_name, playlist_id=playlist_id, mood=mood, tracks=mood_tracks)
+
+@app.route("/add_to_existing_playlist", methods=['GET', 'POST'])
+def add_to_existing_playlist():
+    selected_tracks = request.args.getlist('selected_tracks')
+    playlists_owned = spotify_client.get_user_playlists_owned()
+    playlist_data = [{'name': playlist['name'], 'id': playlist['id']} for playlist in playlists_owned]
+
+    if request.method == 'POST':
+      playlist_id = request.form.get('playlist_id')
+      if playlist_id:
+          try:
+            spotify_client.add_tracks_to_playlist(playlist_id, selected_tracks)
+            return redirect(url_for('added_to_playlist', playlist_id=playlist_id))
+          except Exception as e:
+            return render_template('add_to_existing_playlist.html', no_playlist_found=True)
+
+    return render_template('add_to_existing_playlist.html', playlists=playlist_data, selected_tracks=selected_tracks)
+
+@app.route("/added_to_playlist/<playlist_id>")
+def added_to_playlist(playlist_id):
+    
+    playlist = spotify_client.get_playlist_info(playlist_id)
+    return render_template('added_to_playlist.html', playlist=playlist)
+
+@app.route("/create_playlist", methods=['GET', 'POST'])
+def create_playlist():
+    selected_tracks = request.args.getlist('selected_tracks')
+    print(selected_tracks)
+
+    if request.method == 'POST':
+        # Get the form data
+        playlist_name = request.form.get('playlist_name')
+        playlist_description = request.form.get('playlist_description')
+        playlist_visibility = request.form.get('playlist_visibility')
+
+        # Create the new playlist
+        playlist_id = spotify_client.create_new_playlist(playlist_name, playlist_description, playlist_visibility)
+
+        # Add tracks to the new playlist
+        if playlist_id and selected_tracks:
+            spotify_client.add_tracks_to_playlist(playlist_id, selected_tracks)
+
+        # Redirect to the playlist created path
+        return redirect(url_for('playlist_created', playlist_id=playlist_id))
+
+    # Render the page to enter playlist details and display selected tracks
+    return render_template('create_playlist.html', selected_tracks=selected_tracks)
+
+@app.route("/playlist_created/<playlist_id>")
+def playlist_created(playlist_id):
+    
+    playlist_info = spotify_client.get_playlist_info(playlist_id)
+    return render_template('playlist_created.html', playlist=playlist_info)
 
 
 #NEW PLAYLIST

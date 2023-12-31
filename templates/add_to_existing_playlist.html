@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add to Existing Playlist</title>
+
+  <style>
+    ul#tracks{
+      column-count: 1; /* Set the initial column count to 1 */
+    }
+
+  @media screen and (min-width: 600px) {
+    /* Adjust the column count for larger screens */
+    ul#tracks{
+      column-count: 3;
+    }
+  }
+  </style>
+
+</head>
+<body>
+  {% if no_playlist_found %}
+    <p>Playlist ID Not Found.</p>
+    <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+  {% elif playlists %}
+    <h1>Select One of the Following Playlists to Add Songs to:</h1>
+    <ul>
+      {% for playlist in playlists %}
+        <li>{{ playlist['name'] }} - ID: {{ playlist['id'] }}</li>
+      {% endfor %}
+    </ul>
+    <form method="post">
+      <label for="playlist_id">Enter Playlist ID:</label>
+      <input type="text" name="playlist_id" id="playlist_id" required>
+      <button type="submit">Add Songs to Playlist</button>
+
+      <h2>Selected Songs:</h2>
+      <ul id="tracks">
+        {% for track in selected_tracks %}
+            <li>{{ track }}</li>
+        {% endfor %}
+      </ul>
+    </form>
+
+  {% else %}
+    <p>No Playlists Found.</p>
+  {% endif %}
+
+  <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+</body>
+</html>

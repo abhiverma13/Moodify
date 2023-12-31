@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playlist Mood</title>
+    <title>{{ playlist_name }} {{ mood }}</title>
 
     <style>
       ul {
@@ -16,25 +16,69 @@
         column-count: 3;
       }
     }
-      
     </style>
 </head>
 <body>
     <h1>{{ playlist_name }}</h1>
 
     {% if tracks %}
-        <h2>Sad Tracks:</h2>
+        <h2>{{ mood }} Songs:</h2>
         <ul>
             {% for track in tracks %}
-                <li>{{ track['name'] }} - {{ track['artists'][0]['name'] }}</li>
+                <li>
+                    {{ track['name'] }} - {{ track['artists'][0]['name'] }}
+                    <button class="remove-button" data-track-name="{{ track['name'] }}" data-track-artist="{{ track['artists'][0]['name'] }}">Remove</button>
+                </li>
             {% endfor %}
         </ul>
+        <a href="#" id="createPlaylistButton"><button>Create New Playlist</button></a>
+        <a href="#" id="addToExistingPlaylist"><button>Add to Existing Playlist</button></a>
     {% else %}
-        <p>No sad tracks found in the playlist.</p>
+        <p>No {{ mood }} Songs Found in Playlist.</p>
     {% endif %}
 
     <a href="{{ url_for('playlists') }}"><button>Back to Playlists</button></a>
     <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
     <a href="{{ url_for('playlist_info', playlist_id=playlist_id) }}"><button>Back to Playlist Info</button></a>
+
+    <script>
+        // Initialize an array to store all tracks initially
+        let selectedTracks = Array.from(document.querySelectorAll('.remove-button')).map(button => ({
+            name: button.getAttribute('data-track-name'),
+            artist: button.getAttribute('data-track-artist')
+        }));
+
+        // Add event listener to each remove button
+        document.querySelectorAll('.remove-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Get the track name and artist from the data attributes
+                const trackName = this.getAttribute('data-track-name');
+                const trackArtist = this.getAttribute('data-track-artist');
+
+                // Find the corresponding list item and remove it
+                const listItem = this.parentElement;
+                listItem.remove();
+
+                // Remove the selected track from the array
+                selectedTracks = selectedTracks.filter(track => !(track.name === trackName && track.artist === trackArtist));
+            });
+        });
+
+        // Add event listener to the "Create New Playlist" button
+        document.getElementById('createPlaylistButton').addEventListener('click', function() {
+            // Pass the selectedTracks array to the create_playlist route
+            const queryString = selectedTracks.map(track => `selected_tracks=${track.name}-${track.artist}`).join('&');
+            const url = "{{ url_for('create_playlist') }}" + '?' + queryString;
+            window.location.href = url;
+        });
+
+        // Add event listener to the "Add to Exisiting Playlist" button
+        document.getElementById('addToExistingPlaylist').addEventListener('click', function() {
+            // Pass the selectedTracks array to the create_playlist route
+            const queryString = selectedTracks.map(track => `selected_tracks=${track.name}-${track.artist}`).join('&');
+            const url = "{{ url_for('add_to_existing_playlist') }}" + '?' + queryString;
+            window.location.href = url;
+        });
+    </script>
 </body>
 </html>

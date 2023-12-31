@@ -4,16 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playlist Info</title>
+    <style>
+        #loading-message {
+            display: none;
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <h1>Playlist Info</h1>
     <p>Name: {{ playlist['name'] }}</p>
     <p>Owner: {{ playlist['owner']['display_name'] }}</p>
-    <p>Number of Tracks: {{ playlist['tracks']['total'] }}</p>
+    <p>Number of Songs: {{ playlist['tracks']['total'] }}</p>
 
-    <a href="{{ url_for('playlist_sad', playlist_id=playlist['id']) }}"><button>Sad</button></a>
-    
+    <a id="sad-button" href="{{ url_for('playlist_mood', playlist_id=playlist['id'], mood='Sad') }}" onclick="showLoadingMessage()"><button>Find Sad Songs</button></a>
+    <a id="party-button" href="{{ url_for('playlist_mood', playlist_id=playlist['id'], mood='Party') }}" onclick="showLoadingMessage()"><button>Find Party Songs</button></a>
     <a href="{{ url_for('playlists') }}"><button>Back to Playlists</button></a>
     <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+    <p id="loading-message">Loading Songs (this may take a while)...</p>
+
+    <script>
+        function showLoadingMessage() {
+            // Display the loading message when the Sad button is clicked
+            document.getElementById('loading-message').style.display = 'block';
+
+            // Disable the Sad button to prevent multiple clicks
+            document.getElementById('sad-button').setAttribute('disabled', 'true');
+        }
+    </script>
 </body>
 </html>
