@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify App Setup</title>
+</head>
+<body>
+    <h2>Enter Spotify API Credentials</h2>
+    <form method="post" action="{{ url_for('home') }}">
+        <label for="client_id">Client ID:</label>
+        <input type="text" id="client_id" name="client_id" required><br>
+
+        <label for="client_secret">Client Secret:</label>
+        <input type="text" id="client_secret" name="client_secret" required><br>
+
+        <label for="redirect_uri">Redirect URI:</label>
+        <input type="text" id="redirect_uri" name="redirect_uri" required><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

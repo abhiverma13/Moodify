@@ -59,6 +59,15 @@ class SpotifyClient:
         else:
           print(f'Track "{track_name}" not found.')
 
+    def get_track_id2(self, track_name):
+        results = self.spotify_client.search(q=f'{track_name}', type='track', limit=1)
+        print("Seed Song: " + results['tracks']['items'][0]['name'] + " by " + results['tracks']['items'][0]['artists'][0]['name'])
+        if results['tracks']['items']:
+          track_id = results['tracks']['items'][0]['id']
+          return track_id
+        else:
+          print(f'Track "{track_name}" not found.')
+
     def get_track_audio_features(self, track_id):
         return self.spotify_client.audio_features(track_id)
     
@@ -74,12 +83,25 @@ class SpotifyClient:
 
       # Iterate through the list of tracks and get their IDs
       for track in tracks:
-          track_name, track_artist = track.split('-')
-          track_id = self.get_track_id(track_name.strip(), track_artist.strip())
-          if track_id:
+          try:
+            track_name, track_artist = track.split('by')
+            track_id = self.get_track_id(track_name.strip(), track_artist.strip())
+            if track_id:
               track_ids.append(track_id)
+          except Exception as e:
+            print('Error: ' + str(e))
+            try:
+              track_id = self.get_track_id2(track)
+              if track_id:
+                track_ids.append(track_id)
+            except Exception as e:
+              print('Error: ' + str(e))
 
       # Add the tracks to the playlist
       user_info = self.spotify_client.current_user()
       username = user_info['id']
       self.spotify_client.user_playlist_add_tracks(username, playlist_id, track_ids)
+
+    def get_similar_songs(self, tracks_ids, limit=20):
+      similar_songs = self.spotify_client.recommendations(seed_tracks=tracks_ids, limit=limit)
+      return similar_songs

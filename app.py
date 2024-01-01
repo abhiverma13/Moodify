@@ -156,10 +156,42 @@ def playlist_created(playlist_id):
     return render_template('playlist_created.html', playlist=playlist_info)
 
 
-#NEW PLAYLIST
-@app.route("/enter_seeds")
+#FIND SIMILAR SONGS
+@app.route("/enter_seeds", methods=['GET', 'POST'])
 def enter_seeds():
+    if request.method == 'POST':
+        # Retrieve form data for each seed song
+        seed_song_ids = []
+        seed_songs = []
+        for i in range(1, 6):  # Assuming you have five seed song inputs
+            song_key = f"song{i}"
+            artist_key = f"artist{i}"
+            song_name = request.form.get(song_key)
+            if not song_name:
+                continue
+            artist_name = request.form.get(artist_key)
+            try:
+                song_id = spotify_client.get_track_id(song_name, artist_name)
+                if song_id:
+                    seed_song_ids.append(song_id)
+                    seed_songs.append({'name': song_name, 'artist': artist_name})
+            except Exception as e:
+                return render_template("enter_seeds.html", error=True)
+            
+        num_similar_songs = int(request.form.get('num_songs'))
+        
+        return redirect(url_for('similar_songs_found', seed_song_ids=seed_song_ids, num_similar_songs=num_similar_songs))
+
     return render_template("enter_seeds.html")
+
+@app.route("/similar_songs_found")
+def similar_songs_found():
+    num_similar_songs = request.args.get('num_similar_songs')
+    seed_song_ids = request.args.getlist('seed_song_ids')
+
+    similar_songs = spotify_client.get_similar_songs(seed_song_ids, num_similar_songs)
+    similar_songs = [{'name': song['name'], 'artist': song['artists'][0]['name']} for song in similar_songs['tracks']]
+    return render_template("similar_songs_found.html", similar_songs=similar_songs)
 
 if __name__ == "__main__":
     app.run(debug=True)

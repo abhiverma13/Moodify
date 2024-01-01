@@ -9,7 +9,10 @@
       ul {
         column-count: 1; /* Set the initial column count to 1 */
       }
-
+      #loading-message {
+            display: none;
+            color: red;
+      }
     @media screen and (min-width: 600px) {
       /* Adjust the column count for larger screens */
       ul {
@@ -20,7 +23,7 @@
 </head>
 <body>
     <h1>Create Playlist</h1>
-    <form method="post">
+    <form method="post" onsubmit="showLoadingMessage()">
         <label for="playlist_name">Playlist Name (required):</label>
         <input type="text" id="playlist_name" name="playlist_name" required><br>
 
@@ -40,9 +43,20 @@
           {% endfor %}
         </ul>
 
-        <button type="submit">Create Playlist</button>
+        <button id='submit-button' type="submit">Create Playlist</button>
+        <p id="loading-message">Creating Playlist (this may take a while)...</p>
     </form>
     <a href="{{ url_for('playlists') }}"><button>Back to Playlists</button></a>
     <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+
+    <script>
+      function showLoadingMessage() {
+          // Display the loading message when the Sad button is clicked
+          document.getElementById('loading-message').style.display = 'block';
+
+          // Disable the Sad button to prevent multiple clicks
+          document.getElementById('submit-button').setAttribute('disabled', 'true');
+      }
+    </script>
 </body>
 </html>
