@@ -1,4 +1,4 @@
-# Spotify-Playlist-Generator
+# Spotify VibeCraftr
 
 This Flask web application interacts with the Spotify API to perform various tasks related to your playlists, including finding new song recommendations and finding the existing songs in your playlists according to your mood.
 
