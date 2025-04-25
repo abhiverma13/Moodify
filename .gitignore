@@ -1,2 +1,5 @@
 .env
+.venv
 .cache
+moodify.egg-info
+moodify\__pycache__

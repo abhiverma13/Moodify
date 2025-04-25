@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moodify"              # the package name on PyPI
+version = "0.1.0"
+description = "Mood-based Spotify playlist curator"
+authors = [{ name = "Abhi Verma", email = "a.verma1304@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []             # core runtime deps
+
+[project.scripts]
+moodify = "moodify.cli:app"   # this creates the console command
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["moodify*"]      # pick up moodify and any sub-packages
+exclude = ["data*"]         # ignore your data folder
