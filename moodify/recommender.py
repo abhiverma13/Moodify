@@ -3,6 +3,11 @@ from .client import MoodifySession
 from .data import DataBuilder
 from .model import MoodNet
 
+_FEATURE_COLUMNS = [  # 1‑to‑1 with Spotify audio features
+    "acousticness", "danceability", "energy", "instrumentalness", "liveness",
+    "loudness", "speechiness", "tempo", "valence", "duration_ms",
+]
+
 class Curator:
     """High‑level utility you will call from notebooks or the CLI."""
 
