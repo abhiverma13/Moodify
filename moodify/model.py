@@ -35,16 +35,19 @@ class MoodNet:
 
     @staticmethod
     def _build_keras(input_dim: int, output_dim: int):
-        return Sequential([
+        model = Sequential([
             Input(shape=(input_dim,)),
             Dense(64, activation="relu"),
             Dense(32, activation="relu"),
             Dense(output_dim, activation="softmax"),
-        ]).compile(
+        ])
+        model.compile(
             optimizer="adam",
             loss="sparse_categorical_crossentropy",
             metrics=["accuracy"],
         )
+        return model               # ← return the compiled model, *not* compile()
+
 
     # ------------------------------------------------------------------
     # Training
