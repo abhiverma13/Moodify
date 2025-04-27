@@ -61,7 +61,7 @@ class MoodNet:
         X = self.scaler.fit_transform(X)
 
         X_tr, X_val, y_tr, y_val = train_test_split(
-            X, y, test_size=0.20, stratify=y, random_state=42
+            X, y, test_size=0.20, stratify=y
         )
 
         self.model = self._build_keras(X.shape[1], len(self.encoder.classes_))
