@@ -3,7 +3,7 @@
 
 ![Moodify playlist screenshot](moodify_spotify_playlist.png)
 
-I built **Moodify** after realising some of my playlists had become musical soups. Searching for chill study music meant endless skips past dance bangers, and vice‑versa. By learning **your** mood labels from the playlists you already keep (Happy, Sad, Energetic, Calm—or any words you like), Moodify trains a compact neural net and then auto‑filters any playlist or CSV into fresh, mood‑pure playlists right inside your Spotify account.
+I built **Moodify**, a CLI tool, after realising some of my playlists had become musical soups. Searching for chill study music meant endless skips past dance bangers, and vice‑versa. By learning **your** mood labels from the playlists you already keep (Happy, Sad, Energetic, Calm—or any words you like), Moodify trains a compact neural net and then auto‑filters any playlist or CSV into fresh, mood‑pure playlists right inside your Spotify account.
 
 ---
 
