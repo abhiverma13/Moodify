@@ -75,6 +75,11 @@ cp .env.example .env        # then paste CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 > **Spotify setup:** create a developer app at <https://developer.spotify.com/dashboard>, add
 > `http://127.0.0.1:8888/callback` as a Redirect URI, and copy the keys into `.env`.
 
+> [!WARNING]
+> Spotify restricted its audio-features endpoint for new developer apps in late 2024, so `build-dataset` and
+> `curate --playlist` may not work with newly created apps. Training (`moodify train data/train.csv`) and CSV curation
+> (`moodify curate Calm --csv data/test_playlist.csv`) still work, since the audio features are already included in
+> the repo's CSVs.
 ---
 
 ## Quick Start
